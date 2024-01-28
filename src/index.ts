@@ -4,6 +4,7 @@ import type {
     Adapter,
     DatabaseSession,
     DatabaseUser,
+    RegisteredDatabaseSessionAttributes,
 } from "lucia";
 export class RedisAdapter implements Adapter {
     redisClient: Redis
@@ -11,7 +12,7 @@ export class RedisAdapter implements Adapter {
     constructor(redisClient: Redis) {
         this.redisClient = redisClient
     }
-    
+
     public async deleteSession(sessionId: string): Promise<void> {
         try {
             await this.redisClient.del(sessionId);
@@ -19,7 +20,7 @@ export class RedisAdapter implements Adapter {
             // ignore if session id is invalid
         }
     }
-    
+
     public async deleteUserSessions(userId: string): Promise<void> {
         const sessionIds = await this.redisClient.smembers(userId);
         await Promise.all([
@@ -27,14 +28,16 @@ export class RedisAdapter implements Adapter {
             this.redisClient.del(userId)
         ]);
     }
-    
+
     public async getSessionAndUser(
         sessionId: string
     ): Promise<[session: DatabaseSession | null, user: DatabaseUser | null]> {
-        let result = await this.redisClient.get(sessionId) || ""
-        return [JSON.parse(result) || null, null];
+
+        let result = await this.redisClient.get(sessionId) || "{}"
+        console.log(result);
+        return [transformIntoDatabaseSession(JSON.parse(result)) || null, {} as DatabaseUser];
     }
-    
+
     public async getUserSessions(userId: string): Promise<DatabaseSession[]> {
         const sessionIds = await this.redisClient.smembers(userId);
         const sessionData = await Promise.all(
@@ -48,6 +51,7 @@ export class RedisAdapter implements Adapter {
     }
 
     public async setSession(value: DatabaseSession): Promise<void> {
+        console.log(value);
         await Promise.all([
             this.redisClient.sadd(value.userId, value.id),
             this.redisClient.set(
@@ -58,7 +62,7 @@ export class RedisAdapter implements Adapter {
             )
         ]);
     }
-    
+
     public async updateSessionExpiration(sessionId: string, expiresAt: Date): Promise<void> {
         let data = await this.redisClient.get(sessionId) as DatabaseSession
         data.expiresAt = expiresAt
@@ -69,4 +73,20 @@ export class RedisAdapter implements Adapter {
     public async deleteExpiredSessions(): Promise<void> {
 
     }
+}
+interface SessionSchema extends RegisteredDatabaseSessionAttributes {
+    id: string;
+    userId: string;
+    expiresAt: Date | string;
+    attributes: any
+}
+
+function transformIntoDatabaseSession(raw: SessionSchema): DatabaseSession {
+    const { id, userId, expiresAt, ...attributes } = raw;
+    return {
+        userId,
+        id,
+        expiresAt:new Date(expiresAt),
+        attributes
+    };
 }

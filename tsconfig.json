@@ -11,6 +11,6 @@
 		"noImplicitAny": true,
 		"allowSyntheticDefaultImports": true
 	},
-	"include": ["src", "test/test.ts"],
+	"include": ["src"],
 	"exclude": ["node_modules/", "**/*.test.ts"]
 }

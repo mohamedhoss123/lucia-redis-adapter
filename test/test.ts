@@ -7,9 +7,9 @@ let adapter = new RedisAdapter(redis)
 
 async function main(){
     // let data = await adapter.setSession({id:"tqwtq12321qweqwe",userId:"ewqiuewqueq",expiresAt:createDate(new TimeSpan(500,"h")),attributes:{username:"hellow",ez:"manga"}})
-    let data = await adapter.deleteUserSessions("ewqiuewqueq")
+    let data = await adapter.getSessionAndUser("01HN8HERF81R4Q8Y95ZKSCRSQX")
 
-    console.log((await adapter.getUserSessions("ewqiuewqueq")));
+    console.log(data);
     redis.disconnect() 
 }
 
