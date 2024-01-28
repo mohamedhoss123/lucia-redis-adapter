@@ -1,0 +1,24 @@
+{
+  "name": "lucia-redis-adapter",
+  "version": "1.0.0",
+  "description": "redis adapter for lucia",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+
+  "scripts": {
+    "dev": "tsx watch test/test.ts",
+    "build":"tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsx": "^4.7.0"
+  },
+
+  "peerDependencies": {
+    "ioredis": "^5.0.0",
+    "lucia": "^3.0.0",
+    "oslo": "^1.0.0"
+  }
+}
