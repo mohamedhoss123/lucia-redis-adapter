@@ -1,17 +1,22 @@
 {
   "name": "lucia-redis-adapter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "redis adapter for lucia",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-
   "scripts": {
     "dev": "tsx watch test/test.ts",
     "build":"tsc"
   },
   "author": "",
   "license": "ISC",
+  "homepage": "https://github.com/mohamedhoss123/lucia-redis-adapter",
+  "keywords": [
+    "lucia",
+    "redis",
+    "auth"
+  ],
   "devDependencies": {
     "tsx": "^4.7.0"
   },
