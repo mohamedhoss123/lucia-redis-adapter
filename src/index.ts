@@ -34,7 +34,6 @@ export class RedisAdapter implements Adapter {
     ): Promise<[session: DatabaseSession | null, user: DatabaseUser | null]> {
 
         let result = await this.redisClient.get(sessionId) || "{}"
-        console.log(result);
         return [transformIntoDatabaseSession(JSON.parse(result)) || null, {} as DatabaseUser];
     }
 
