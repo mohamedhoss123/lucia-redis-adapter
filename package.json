@@ -1,6 +1,6 @@
 {
   "name": "lucia-redis-adapter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "redis adapter for lucia",
   "type": "module",
   "main": "./dist/index.js",

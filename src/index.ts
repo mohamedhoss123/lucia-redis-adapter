@@ -81,7 +81,7 @@ interface SessionSchema extends RegisteredDatabaseSessionAttributes {
 }
 
 function transformIntoDatabaseSession(raw: SessionSchema): DatabaseSession {
-    const { id, userId, expiresAt, ...attributes } = raw;
+    const { id, userId, expiresAt, attributes } = raw;
     return {
         userId,
         id,
