@@ -1,6 +1,6 @@
 {
   "name": "lucia-redis-adapter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "redis adapter for lucia",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,7 +15,8 @@
   "keywords": [
     "lucia",
     "redis",
-    "auth"
+    "auth",
+    "ioredis"
   ],
   "devDependencies": {
     "tsx": "^4.7.0"

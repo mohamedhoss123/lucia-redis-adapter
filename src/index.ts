@@ -15,7 +15,9 @@ export class RedisAdapter implements Adapter {
 
     public async deleteSession(sessionId: string): Promise<void> {
         try {
+            let session = JSON.parse(await this.redisClient.get(sessionId)) as SessionSchema
             await this.redisClient.del(sessionId);
+            await this.redisClient.srem(session.userId,sessionId);
         } catch {
             // ignore if session id is invalid
         }
