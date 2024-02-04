@@ -15,9 +15,13 @@ export class RedisAdapter implements Adapter {
 
     public async deleteSession(sessionId: string): Promise<void> {
         try {
-            let session = JSON.parse(await this.redisClient.get(sessionId)) as SessionSchema
-            await this.redisClient.del(sessionId);
-            await this.redisClient.srem(session.userId,sessionId);
+            const sessionData = await this.redisClient.get(sessionId)
+            if (!sessionData) return
+            const session = JSON.parse(sessionData) as SessionSchema
+            await Promise.all([
+                this.redisClient.del(sessionId),
+                this.redisClient.srem(session.userId, sessionId),
+            ])
         } catch {
             // ignore if session id is invalid
         }
@@ -87,7 +91,7 @@ function transformIntoDatabaseSession(raw: SessionSchema): DatabaseSession {
     return {
         userId,
         id,
-        expiresAt:new Date(expiresAt),
+        expiresAt: new Date(expiresAt),
         attributes
     };
 }
