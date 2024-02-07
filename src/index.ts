@@ -56,6 +56,8 @@ export class RedisAdapter implements Adapter {
     }
 
     public async setSession(value: DatabaseSession): Promise<void> {
+        console.log(Number(value.expiresAt));
+        console.log(Date.now() );
         console.log(value);
         await Promise.all([
             this.redisClient.sadd(value.userId, value.id),
@@ -63,7 +65,7 @@ export class RedisAdapter implements Adapter {
                 value.id,
                 JSON.stringify(value),
                 "EX",
-                Math.floor(Number(value.expiresAt) / 1000)
+                Math.floor((Number(value.expiresAt)-Date.now()) / 1000)
             )
         ]);
     }
