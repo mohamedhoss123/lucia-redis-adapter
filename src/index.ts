@@ -17,7 +17,7 @@ export class RedisAdapter implements Adapter {
         try {
             const sessionData = await this.redisClient.get(sessionId)
             if (!sessionData) return
-            const session = JSON.parse(sessionData) as SessionSchema
+            const session = JSON.parse(sessionData) as DatabaseSession
             await Promise.all([
                 this.redisClient.del(sessionId),
                 this.redisClient.srem(session.userId, sessionId),
@@ -45,27 +45,34 @@ export class RedisAdapter implements Adapter {
 
     public async getUserSessions(userId: string): Promise<DatabaseSession[]> {
         const sessionIds = await this.redisClient.smembers(userId);
-        const sessionData = await Promise.all(
+        const allSessions = await Promise.all(
             sessionIds.map((sessionId: string) => this.redisClient.get(sessionId))
         );
-        const sessions = sessionData
-            .filter((val): val is NonNullable<typeof val> => val !== null)
-            .map((val) => JSON.parse(val) as SessionSchema);
+        const sessionsToRemove :string[]= []
+        const sessionsToReturn :string[]= []
+        allSessions.forEach((element:null|string,index:number) => {
+            if(element ===null){
+                sessionsToRemove.push(sessionIds[index])
+            }else{
+                sessionsToReturn.push(element)
+            }
+        });
+        await Promise.all(
+            sessionsToRemove.map((sessionId: string) => this.redisClient.srem(userId,sessionId))
+        );
+        const sessions = sessionsToReturn
+            .map((val) => JSON.parse(val) as DatabaseSession);
         return sessions;
-        return []
     }
 
     public async setSession(value: DatabaseSession): Promise<void> {
-        console.log(Number(value.expiresAt));
-        console.log(Date.now() );
-        console.log(value);
         await Promise.all([
             this.redisClient.sadd(value.userId, value.id),
             this.redisClient.set(
                 value.id,
                 JSON.stringify(value),
                 "EX",
-                Math.floor((Number(value.expiresAt)-Date.now()) / 1000)
+                Math.floor((Number(value.expiresAt) - Date.now()) / 1000)
             )
         ]);
     }
